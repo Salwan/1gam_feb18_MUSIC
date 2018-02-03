@@ -4,10 +4,18 @@ using UnityEngine;
 
 public class ArcElement : MonoBehaviour {
 
-	public float arcAngle = 0.0f; // 0.0: none, 180.0: half, 360.0: all
-	public int faceCount = 36;
-	public float radius = 3.0f;
+	public float arcAngle {
+		get { return m_arcAngle; }
+		set { 
+				m_arcAngle = Mathf.Min(value, 360.0f);
+				m_updateArc = true;
+		 }
+	}
 
+	private float m_arcAngle = 0.0f; // 0.0: none, 180.0: half, 360.0: all
+	private int faceCount = 36;
+	private float radius = 0.38f;
+	private bool m_updateArc = false;
 	private MeshFilter m_meshFilter;
 	
 	void Awake() {
@@ -78,7 +86,7 @@ public class ArcElement : MonoBehaviour {
 		float angle_step = 360.0f / (float)faceCount;
 		int last_face = -1;
 		for(int i = 0; i < faceCount; ++i) {
-			if(angle + angle_step <= arcAngle) {
+			if(angle + angle_step <= m_arcAngle) {
 				// Enable
 				tris[(i * 3) + 0] = 0; // center vertex
 				tris[(i * 3) + 1] = i + 1;
@@ -98,8 +106,8 @@ public class ArcElement : MonoBehaviour {
 		}
 
 		// Calculate arc vertex (extra trailing vertex)
-		float ax = -Mathf.Cos(arcAngle * Mathf.Deg2Rad);
-		float ay = Mathf.Sin(arcAngle * Mathf.Deg2Rad);
+		float ax = -Mathf.Cos(m_arcAngle * Mathf.Deg2Rad);
+		float ay = Mathf.Sin(m_arcAngle * Mathf.Deg2Rad);
 		Vector3 arc_vert = new Vector3(radius * ax, radius * ay, 0.0f);
 		Vector2 arc_uv = new Vector2((ax * 0.5f) + 0.5f, (ay * 0.5f) + 0.5f);
 
@@ -109,8 +117,6 @@ public class ArcElement : MonoBehaviour {
 		uvs[verts_count - 1] = arc_uv;
 		mesh.vertices = verts;
 		mesh.uv = uvs;
-		//mesh.vertices[verts_count - 1] = arc_vert;
-		//mesh.uv[verts_count - 1] = arc_uv;
 
 		// Use last pie vertex in combination with arc vertex to generate last triangle
 		if(last_face > -1) {
@@ -129,10 +135,9 @@ public class ArcElement : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		arcAngle += Time.deltaTime * 90.0f;
-		while(arcAngle > 360.0f) {
-			arcAngle -= 360.0f;
+		if(m_updateArc) {
+			UpdateArc();
+			m_updateArc = false;
 		}
-		UpdateArc();
 	}
 }
