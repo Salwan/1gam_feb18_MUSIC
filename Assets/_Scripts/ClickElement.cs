@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class ClickElement : MonoBehaviour {
 
+	public void Initialize(Vector3 position, float arc_time = 4.0f) {
+		transform.localPosition = position;
+		m_arcSpeed = 360.0f / arc_time;
+	}
+
 	private enum HitState {
 		Perfect,
 		Hit,

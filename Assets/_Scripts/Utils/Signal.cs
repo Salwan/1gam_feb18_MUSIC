@@ -7,6 +7,54 @@ using UnityEngine;
 // C# doesn't support variadic generics in 3.5 (or at all it seems as the implementation is different)
 // C# events are basically Signal-Slot (Publisher and Subscribers). But it's fun implementing my own.
 
+// SIGNAL T0
+public class Signal {
+    private List<Action> m_slots;
+    public Signal() {
+        m_slots = new List<Action>();
+    }
+
+    // Connects to slot, returns false if slot is already connected
+    public bool connect(Action slot) {
+        if(!m_slots.Contains(slot)) {
+            m_slots.Add(slot);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // Disconnects from slot, returns false if slot is not found
+    public bool disconnect(Action slot) {
+        return m_slots.Remove(slot);
+    }
+
+    // Disconnects all slots, returns how many
+    public int disconnectAll() {
+        int c = m_slots.Count;
+        m_slots.Clear();
+        return c;
+    }
+
+    // Emits signal to all connected slots
+    public int emit() {
+        foreach(Action sh in m_slots) {
+            sh();
+        }
+        return m_slots.Count;
+    }
+
+    // Operators: removed because they don't compile when used via returning a signal from function
+    public static Signal operator +(Signal sig, Action slot) {
+        sig.connect(slot);
+        return sig;
+    }
+    public static Signal operator -(Signal sig, Action slot) {
+        sig.disconnect(slot);
+        return sig;
+    }
+}
+
 // SIGNAL T1
 public class Signal<T1> {
     private List<Action<T1>> m_slots;
@@ -133,6 +181,9 @@ public class Signal<T1,T2,T3> {
 
 // Just testing
 class HandlerTest {
+    public void testHandle0() {
+        Debug.Log("Test handle no params");
+    }
     public void testHandle1(int a) {
         Debug.Log("Test Handle 1 = " + a.ToString());
     }
@@ -158,9 +209,17 @@ class SignalTest {
         //sig.connect(ht.testHandle2);
         sig += ht.testHandle2;
         sig.emit(4499);
+
+        Signal sig0 = new Signal();
+        sig0.connect(ht.testHandle0);
+        sig0.emit();
     }
 
     public void testHandleInner(int a) {
         Debug.Log("Test Handle Inner = " + a.ToString());
+    }
+
+    public void testHandleInner0() {
+        Debug.Log("Test handle no params");
     }
 }

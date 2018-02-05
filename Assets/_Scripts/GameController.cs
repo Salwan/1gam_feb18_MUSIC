@@ -1,11 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 public class GameController : MonoBehaviour {
 
 	public GameObject m_startText;
 	public Maestro m_maestro; // TODO: this should be created inside GameController
+	public GameObject m_footerGradient;
 
 	private enum GState {
 		Init,
@@ -21,6 +23,7 @@ public class GameController : MonoBehaviour {
 	}
 
 	void Start() {
+		Assert.IsTrue(m_footerGradient != null);
 		m_maestro.tickSignal.connect(OnTickTock);
 		StartGame();
 	}
@@ -48,6 +51,6 @@ public class GameController : MonoBehaviour {
 
 	// Bigtick is the first tick in a 4 tick bar
 	void OnTickTock(bool bigtick) {
-		
+		m_footerGradient.GetComponent<TweenScaleOnTick>().OnTickTock(bigtick);
 	}
 }

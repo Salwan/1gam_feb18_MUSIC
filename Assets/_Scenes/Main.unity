@@ -884,6 +884,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_startText: {fileID: 459349937}
   m_maestro: {fileID: 2140771462}
+  m_footerGradient: {fileID: 1705407560}
 --- !u!4 &1519760248
 Transform:
   m_ObjectHideFlags: 0
@@ -924,7 +925,7 @@ Transform:
   m_GameObject: {fileID: 1705407560}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 1.25, z: 0}
-  m_LocalScale: {x: 8, y: 2.5751073, z: 1}
+  m_LocalScale: {x: 8, y: 2.575107, z: 1}
   m_Children: []
   m_Father: {fileID: 35376922}
   m_RootOrder: 0
@@ -995,6 +996,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0229b24ed68f741a0918340f5fe644bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_startScale: {x: 8, y: 2.575107, z: 1}
+  m_tickScale: {x: 8, y: 5.32, z: 1}
+  m_tockScale: {x: 8, y: 3.51, z: 1}
 --- !u!1 &1816007234
 GameObject:
   m_ObjectHideFlags: 0
@@ -1425,6 +1429,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_musicClip: {fileID: 8300000, guid: 0a18948e430e74a9697600df1ee285c1, type: 3}
   m_musicLabels: {fileID: 4900000, guid: 1b29371caba434a9ab75f1ec5f4b9542, type: 3}
+  m_boundary:
+    m_Center: {x: 0, y: 0, z: 2}
+    m_Extent: {x: 3, y: 3, z: 0}
+  m_clickElementPrefab: {fileID: 1527351202998934, guid: 065c124bd6e7a474fa4542206afc9a3a,
+    type: 2}
 --- !u!4 &2140771463
 Transform:
   m_ObjectHideFlags: 0
@@ -1432,8 +1441,8 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2140771460}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 4.42, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: 5.85, z: 0}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_Children:
   - {fileID: 832321549}
   - {fileID: 1905584220}
