@@ -85,7 +85,7 @@ public class ClickElement : MonoBehaviour {
 			if(m_arcElement.arcAngle >= 360.0f - m_clickAngleOffset) {
 				m_clickAngle += Time.deltaTime * m_arcSpeed;
 				if(m_clickAngle > m_clickAngleOffset * 2.0f) {
-					Debug.Log("Angle = " + m_clickAngle.ToString());
+					//Debug.Log("Angle = " + m_clickAngle.ToString());
 					Miss();
 				}
 			}
@@ -143,6 +143,7 @@ public class ClickElement : MonoBehaviour {
 			case HitState.Early:
 				mr.material.mainTexture = m_outcomeMiss;
 				score = GameController.Score_Early;
+				m_gameCont.OnMiss();
 				break;
 			case HitState.Hit:
 				m_audioSource.clip = m_hitSound;
@@ -156,6 +157,7 @@ public class ClickElement : MonoBehaviour {
 				m_audioSource.Play();
 				mr.material.mainTexture = m_outcomeMiss;
 				score = GameController.Score_Miss;
+				m_gameCont.OnMiss();
 				break;
 			case HitState.Perfect:
 				// TODO: Perfect should have a special sound!

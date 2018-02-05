@@ -30,6 +30,23 @@ public class Maestro : MonoBehaviour {
 	public Signal<bool> m_tickSignal;
 	public Signal m_syncSignal;
 	public Signal m_pauseSignal;
+	public Signal m_finishedSignal;
+
+	public int totalClicksCount {
+		get { return m_totalClicksCount; }
+	}
+
+	public int estimatePerfectScore {
+		get { return m_totalClicksCount * 250; }
+	}
+
+	public int estimateAllScore {
+		get { return m_totalClicksCount * 100; }
+	}
+
+	public float damageOfMissClicks {
+		get { return 1.0f / (float)m_totalClicksCount; }
+	}
 
 	private bool m_bEnabled;
 	private AudioSource m_audioSource;
@@ -45,6 +62,7 @@ public class Maestro : MonoBehaviour {
 	private double m_bpmTick;	// Times current tick to figure out when to fire event
 	private int m_tickType;  	// Loops 0 1 2 3, big tick on 0, small tock on 1 2 3 (tick type)
 	private bool m_bTicking;		// Enables/disables ticking, will be used based on 'pause' label in Audacity
+	private int m_totalClicksCount;	// Total number of clicks based on patterns
 
 	public int tempo {
 		get { return m_currentTempo; }
@@ -68,6 +86,10 @@ public class Maestro : MonoBehaviour {
 		get { return m_tickSignal; }
 	}
 
+	public Signal finishedSignal {
+		get { return m_finishedSignal; }
+	}
+
 	void Awake() {
 		m_bEnabled = false;
 		m_audioSource = GetComponent<AudioSource>();
@@ -84,6 +106,8 @@ public class Maestro : MonoBehaviour {
 		m_tickSignal = new Signal<bool>();
 		m_syncSignal = new Signal();
 		m_pauseSignal = new Signal();
+		m_finishedSignal = new Signal();
+		m_totalClicksCount = 0;
 	}
 	
 	void Start() {
@@ -142,8 +166,14 @@ public class Maestro : MonoBehaviour {
 	public void Begin() {
 		// Starts music and sync timers
 		m_audioSource.clip = m_musicClip;
+		m_audioSource.loop = false;
 		m_audioSource.Play();
+		Invoke("SignalEnd", m_musicClip.length);
 		m_bEnabled = true;
+	}
+
+	void SignalEnd() {
+		m_finishedSignal.emit();
 	}
 
 	public void End() {
@@ -262,6 +292,7 @@ public class Maestro : MonoBehaviour {
 		Assert.IsTrue(m_patternList != null && m_patternList.Count > 0);
 		m_actions = new List<SActionElement>();
 		m_reactionTime = 4.0f;
+		m_totalClicksCount = 0;
 		int quadrant = 0; // used to avoid randomly overlapping simple clicks
 		foreach(SPatternEntry pe in m_patternList) {
 			// Support for type 0 first
@@ -271,6 +302,7 @@ public class Maestro : MonoBehaviour {
 				ae.time = pe.time - m_reactionTime;
 				// Simple Click
 				if(pe.pattern == 0) {
+					m_totalClicksCount += 1;
 					ae.type = EElement.Click;
 					int x_side = quadrant < 2? x_side = 1 : x_side = -1;
 					int y_side = quadrant == 1 || quadrant == 3? y_side = -1 : y_side = 1;
@@ -278,21 +310,25 @@ public class Maestro : MonoBehaviour {
 					ae.y = UnityEngine.Random.Range(0.5f * y_side, m_boundary.max.y * y_side);
 					quadrant = (quadrant + 1) % 4;
 				} else if(pe.pattern == 1) {
+					m_totalClicksCount += 4;
 					ae.type = EElement.Line;
 					// Left
 					ae.x = m_boundary.min.x;
 					ae.y = m_boundary.center.y;
 				} else if(pe.pattern == 2) {
+					m_totalClicksCount += 4;
 					ae.type = EElement.ZigZag;
 					// Left-top
 					ae.x = m_boundary.min.x;
 					ae.y = m_boundary.max.y;
 				} else if(pe.pattern == 3) {
+					m_totalClicksCount += 4;
 					ae.type = EElement.Ladder;
 					// Left-bottom
 					ae.x = m_boundary.min.x;
 					ae.y = m_boundary.min.y;
 				} else if(pe.pattern == 4) {
+					m_totalClicksCount += 4;
 					ae.type = EElement.UpDown;
 					// Right-Top
 					ae.x = m_boundary.max.x;
