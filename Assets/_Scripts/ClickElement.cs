@@ -1,12 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 public class ClickElement : MonoBehaviour {
 
-	public void Initialize(Vector3 position, float arc_time = 4.0f) {
+	public void Initialize(Vector3 position, float arc_time = 4.0f, float delay = 0.0f) {
 		transform.localPosition = position;
 		m_arcSpeed = 360.0f / arc_time;
+		m_delay = delay;
 	}
 
 	private enum HitState {
@@ -32,6 +34,9 @@ public class ClickElement : MonoBehaviour {
 	private AudioSource m_audioSource;
 	private bool m_bDone = false;
 	private GameObject m_outcome;
+	private GameController m_gameCont;
+
+	private float m_delay = 0.0f;
 
 	void Awake() {
 		m_arcElement = GetComponentInChildren<ArcElement>();
@@ -48,18 +53,34 @@ public class ClickElement : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		GameObject gc = GameObject.FindWithTag("GameController");
+		Assert.IsTrue(gc != null);
+		m_gameCont = gc.GetComponent<GameController>();
+		Assert.IsTrue(m_gameCont != null);
 		// Spawn 1 turn head (always)
 		m_turnHeads = new List<GameObject>();
 		GameObject th = Instantiate(m_turnHeadPrefab, transform.position, Quaternion.identity, transform) as GameObject;
 		TurnHead turnhead = th.GetComponent<TurnHead>();
-		turnhead.delay = 0.0f;
+		turnhead.delay = m_delay;
 		turnhead.speed = m_arcSpeed;
 		m_turnHeads.Add(th);
+
+		if(m_delay > 0.0f) {
+			transform.localScale = new Vector3(transform.localScale.x / 2.0f, transform.localScale.y / 2.0f, 1.0f);
+			GetComponent<SphereCollider>().enabled = false;
+		}
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		if(!m_bDone) {
+		if(m_delay > 0.0f) {
+			m_delay -= Time.deltaTime;
+			if(m_delay <= 0.0f) {
+				transform.localScale = new Vector3(transform.localScale.x * 2.0f, transform.localScale.y * 2.0f, 1.0f);
+				GetComponent<SphereCollider>().enabled = true;
+				m_delay = 0.0f;
+			}
+		} else if(!m_bDone) {
 			m_arcElement.arcAngle += Time.deltaTime * m_arcSpeed;
 			if(m_arcElement.arcAngle >= 360.0f - m_clickAngleOffset) {
 				m_clickAngle += Time.deltaTime * m_arcSpeed;
@@ -72,7 +93,7 @@ public class ClickElement : MonoBehaviour {
 	}
 
 	void OnMouseDown() {
-		if(!m_bDone) {
+		if(m_delay == 0.0f && !m_bDone) {
 			if(m_clickAngle == 0.0f) {
 				Miss(true);
 			} else if(m_clickAngle >= m_clickAngleOffset * 0.75f && m_clickAngle <= m_clickAngleOffset * 1.25f) {
@@ -117,20 +138,24 @@ public class ClickElement : MonoBehaviour {
 		// TODO: sound effects should be played by game controller since they should play regardless of active state or destroy
 		MeshRenderer mr = m_outcome.GetComponent<MeshRenderer>();
 		bool emit_particle = false;
+		int score = 0;
 		switch(state) {
 			case HitState.Early:
 				mr.material.mainTexture = m_outcomeMiss;
+				score = GameController.Score_Early;
 				break;
 			case HitState.Hit:
 				m_audioSource.clip = m_hitSound;
 				m_audioSource.Play();
 				mr.material.mainTexture = m_outcomeHit;
 				emit_particle = true;
+				score = GameController.Score_Hit;
 				break;
 			case HitState.Miss:
 				m_audioSource.clip = m_missSound;
 				m_audioSource.Play();
 				mr.material.mainTexture = m_outcomeMiss;
+				score = GameController.Score_Miss;
 				break;
 			case HitState.Perfect:
 				// TODO: Perfect should have a special sound!
@@ -138,8 +163,10 @@ public class ClickElement : MonoBehaviour {
 				m_audioSource.Play();
 				mr.material.mainTexture = m_outcomePerfect;
 				emit_particle = true;
+				score = GameController.Score_Perfect;
 				break;
 		}
+		m_gameCont.AddScore(score);
 		m_outcome.SetActive(true);
 		if(emit_particle) {
 			GameObject particle_effect = Instantiate(m_particleFeedback, transform.position, transform.rotation);

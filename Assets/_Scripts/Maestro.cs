@@ -251,6 +251,7 @@ public class Maestro : MonoBehaviour {
 	};
 	public Bounds m_boundary;
 	public GameObject m_clickElementPrefab;
+	public GameObject m_connectorPrefab;
 
 	private float m_reactionTime = 4.0f; // Time between visual element and actual click expected event
 	private List<SActionElement> m_actions; 
@@ -326,20 +327,91 @@ public class Maestro : MonoBehaviour {
 				go.GetComponent<ClickElement>().Initialize(new Vector3(ae.x, ae.y, 0.0f), m_reactionTime);				
 			} else if(ae.type == EElement.Line) {
 				Debug.Log("Summon: LINE");
-				GameObject go = Instantiate(m_clickElementPrefab, transform.position, Quaternion.identity);
-				go.GetComponent<ClickElement>().Initialize(new Vector3(ae.x, ae.y, 0.0f), m_reactionTime);
+				GameObject[] go = {
+					Instantiate(m_clickElementPrefab, transform.position, Quaternion.identity),
+					Instantiate(m_clickElementPrefab, transform.position, Quaternion.identity),
+					Instantiate(m_clickElementPrefab, transform.position, Quaternion.identity),
+					Instantiate(m_clickElementPrefab, transform.position, Quaternion.identity)
+				};  	
+				float w = m_boundary.size.x;
+				float y = UnityEngine.Random.Range(m_boundary.min.y, m_boundary.max.y);
+				for(int i = 0; i < 4; ++i) {
+					float delay = (float)m_bpmPeriod * (float)i;
+					float x = m_boundary.min.x + (w * (float)i / 3.0f);
+					go[i].GetComponent<ClickElement>().Initialize(new Vector3(x, y, 0.0f), m_reactionTime, delay);
+				}	
 			} else if(ae.type == EElement.ZigZag) {
 				Debug.Log("Summon: ZIGZAG");
-				GameObject go = Instantiate(m_clickElementPrefab, transform.position, Quaternion.identity);
-				go.GetComponent<ClickElement>().Initialize(new Vector3(ae.x, ae.y, 0.0f), m_reactionTime);
+				GameObject[] go = {
+					Instantiate(m_clickElementPrefab, transform.position, Quaternion.identity),
+					Instantiate(m_clickElementPrefab, transform.position, Quaternion.identity),
+					Instantiate(m_clickElementPrefab, transform.position, Quaternion.identity),
+					Instantiate(m_clickElementPrefab, transform.position, Quaternion.identity)
+				};
+				GameObject line = Instantiate(m_connectorPrefab, new Vector3(0.0f, 0.0f, 2.5f), Quaternion.identity);
+				line.transform.localPosition = new Vector3(0.0f, 0.0f, 15.0f);
+				LineRenderer lrendr = line.GetComponent<LineRenderer>();
+				lrendr.positionCount = 4;
+				Assert.IsTrue(lrendr != null);
+				float w = m_boundary.size.x - 1.0f;
+				float h = m_boundary.size.y;
+				for(int i = 0; i < 4; ++i) {
+					float delay = (float)m_bpmPeriod * (float)i;
+					float side = i == 1 || i == 3? -1.0f : 1.0f;
+					float x = (side * (m_boundary.max.x - 1.0f)) - 0.5f;
+					float y = m_boundary.max.y - (h * (float)i / 3.0f) - 0.5f;
+					Vector3 pos = new Vector3(x, y, 0.0f);
+					go[i].GetComponent<ClickElement>().Initialize(pos, m_reactionTime, delay);
+					lrendr.SetPosition(i, pos);
+				}
+				GameObject.Destroy(line, m_reactionTime + ((float)m_bpmPeriod * 4.0f));
 			} else if(ae.type == EElement.Ladder) {
 				Debug.Log("Summon: LADDER");
-				GameObject go = Instantiate(m_clickElementPrefab, transform.position, Quaternion.identity);
-				go.GetComponent<ClickElement>().Initialize(new Vector3(ae.x, ae.y, 0.0f), m_reactionTime);
+				GameObject[] go = {
+					Instantiate(m_clickElementPrefab, transform.position, Quaternion.identity),
+					Instantiate(m_clickElementPrefab, transform.position, Quaternion.identity),
+					Instantiate(m_clickElementPrefab, transform.position, Quaternion.identity),
+					Instantiate(m_clickElementPrefab, transform.position, Quaternion.identity)
+				};
+				GameObject line = Instantiate(m_connectorPrefab, new Vector3(0.0f, 0.0f, 2.5f), Quaternion.identity);
+				line.transform.localPosition = new Vector3(0.0f, 0.0f, 15.0f);
+				LineRenderer lrendr = line.GetComponent<LineRenderer>();
+				lrendr.positionCount = 4;
+				Assert.IsTrue(lrendr != null);
+				float w = m_boundary.size.x;
+				float h = m_boundary.size.y;
+				for(int i = 0; i < 4; ++i) {
+					float delay = (float)m_bpmPeriod * (float)i;
+					float x = m_boundary.min.x + (w * (float)i / 3.0f);
+					float y = m_boundary.min.y + (h * (float)i / 3.0f);
+					Vector3 pos = new Vector3(x, y, 0.0f);
+					go[i].GetComponent<ClickElement>().Initialize(pos, m_reactionTime, delay);
+					lrendr.SetPosition(i, pos);
+				}
+				GameObject.Destroy(line, m_reactionTime + ((float)m_bpmPeriod * 4.0f));
 			} else if(ae.type == EElement.UpDown) {
-				Debug.Log("Summon: UPDOWN");
-				GameObject go = Instantiate(m_clickElementPrefab, transform.position, Quaternion.identity);
-				go.GetComponent<ClickElement>().Initialize(new Vector3(ae.x, ae.y, 0.0f), m_reactionTime);
+				GameObject[] go = {
+					Instantiate(m_clickElementPrefab, transform.position, Quaternion.identity),
+					Instantiate(m_clickElementPrefab, transform.position, Quaternion.identity),
+					Instantiate(m_clickElementPrefab, transform.position, Quaternion.identity),
+					Instantiate(m_clickElementPrefab, transform.position, Quaternion.identity)
+				};
+				GameObject line = Instantiate(m_connectorPrefab, new Vector3(0.0f, 0.0f, 2.5f), Quaternion.identity);
+				line.transform.localPosition = new Vector3(0.0f, 0.0f, 15.0f);
+				LineRenderer lrendr = line.GetComponent<LineRenderer>();
+				lrendr.positionCount = 4;
+				Assert.IsTrue(lrendr != null);
+				float w = m_boundary.size.x - 1.0f;
+				for(int i = 0; i < 4; ++i) {
+					float delay = (float)m_bpmPeriod * (float)i;
+					float x = (m_boundary.max.x - 0.5f) - (w * (float)i / 3.0f);
+					float side = i == 1 || i == 3? -1.0f : 1.0f;
+					float yy = (side * (m_boundary.max.y - 1.0f)) - 0.5f;
+					Vector3 pos = new Vector3(x, yy, 0.0f);
+					go[i].GetComponent<ClickElement>().Initialize(pos, m_reactionTime, delay);
+					lrendr.SetPosition(i, pos);
+				}
+				GameObject.Destroy(line, m_reactionTime + ((float)m_bpmPeriod * 4.0f));
 			}
 		}
 		m_currentActionId = current_action_id;

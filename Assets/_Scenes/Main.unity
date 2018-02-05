@@ -535,7 +535,7 @@ GameObject:
   - component: {fileID: 564852223}
   - component: {fileID: 564852222}
   m_Layer: 5
-  m_Name: Text
+  m_Name: ScoreText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -885,6 +885,7 @@ MonoBehaviour:
   m_startText: {fileID: 459349937}
   m_maestro: {fileID: 2140771462}
   m_footerGradient: {fileID: 1705407560}
+  m_scoreText: {fileID: 564852222}
 --- !u!4 &1519760248
 Transform:
   m_ObjectHideFlags: 0
@@ -1433,6 +1434,8 @@ MonoBehaviour:
     m_Center: {x: 0, y: 0, z: 2}
     m_Extent: {x: 3, y: 3, z: 0}
   m_clickElementPrefab: {fileID: 1527351202998934, guid: 065c124bd6e7a474fa4542206afc9a3a,
+    type: 2}
+  m_connectorPrefab: {fileID: 1353419217447600, guid: 26e5e8284bece4dc0bbe9b66d8e826f2,
     type: 2}
 --- !u!4 &2140771463
 Transform:
