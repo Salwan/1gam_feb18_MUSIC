@@ -5,7 +5,7 @@ using UnityEngine;
 public class GameController : MonoBehaviour {
 
 	public GameObject m_startText;
-	public MusicElement m_musicElement; // TODO: this should be created inside GameController
+	public Maestro m_maestro; // TODO: this should be created inside GameController
 
 	private enum GState {
 		Init,
@@ -21,6 +21,7 @@ public class GameController : MonoBehaviour {
 	}
 
 	void Start() {
+		m_maestro.tickSignal.connect(OnTickTock);
 		StartGame();
 	}
 
@@ -37,11 +38,16 @@ public class GameController : MonoBehaviour {
 
 	void PlayGame() {
 		m_state = GState.Playing;
-		m_musicElement.Begin();
+		m_maestro.Begin();
 	}
 
 	void EndGame() {
 		m_state = GState.End;
-		m_musicElement.End();
+		m_maestro.End();
+	}
+
+	// Bigtick is the first tick in a 4 tick bar
+	void OnTickTock(bool bigtick) {
+		
 	}
 }

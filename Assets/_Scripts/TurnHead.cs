@@ -21,7 +21,6 @@ public class TurnHead : MonoBehaviour {
 	private float m_angle = 0.0f;
 	private float m_delay = 0.0f;
 	private float m_speed = 0.0f;
-	private bool m_update = false;
 
 	// Use this for initialization
 	void Start () {
