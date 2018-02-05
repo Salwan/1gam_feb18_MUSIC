@@ -5,8 +5,10 @@ using UnityEngine;
 public class GameController : MonoBehaviour {
 
 	public GameObject m_startText;
+	public MusicElement m_musicElement; // TODO: this should be created inside GameController
 
 	private enum GState {
+		Init,
 		Start,
 		Playing,
 		End,
@@ -15,7 +17,7 @@ public class GameController : MonoBehaviour {
 	private GState m_state;
 
 	void Awake() {
-		m_state = GState.Start;
+		m_state = GState.Init;
 	}
 
 	void Start() {
@@ -23,11 +25,23 @@ public class GameController : MonoBehaviour {
 	}
 
 	void StartGame() {
+		m_state = GState.Start;
 		m_startText.SetActive(true);
 		m_startText.transform.localScale = new Vector3(2.0f, 2.0f, 1.0f);
 		iTween.ScaleTo(m_startText, new Vector3(1.0f, 1.0f, 1.0f), 0.4f);
 		iTween.MoveTo(m_startText, iTween.Hash(
-			"position", new Vector3(12.0f, 4.0f, 0.0f), "time", 0.5f, "delay", 1.0f, "easeType", iTween.EaseType.easeInCirc
+			"position", new Vector3(12.0f, 4.0f, 0.0f), "time", 0.5f, "delay", 1.0f, "easeType", iTween.EaseType.easeInCirc,
+			"oncomplete", "PlayGame", "oncompletetarget", gameObject
 		));
+	}
+
+	void PlayGame() {
+		m_state = GState.Playing;
+		m_musicElement.Begin();
+	}
+
+	void EndGame() {
+		m_state = GState.End;
+		m_musicElement.End();
 	}
 }
