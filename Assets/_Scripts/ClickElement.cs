@@ -15,6 +15,10 @@ public class ClickElement : MonoBehaviour {
 	public float m_clickAngleOffset; // Detection of clicks starts at 360.0 - m_clickAngleOffset and ends 360 + m_ClickAngleOffset
 	public AudioClip m_hitSound;
 	public AudioClip m_missSound;
+	public Texture2D m_outcomeMiss;
+	public Texture2D m_outcomeHit;
+	public Texture2D m_outcomePerfect;
+	public GameObject m_particleFeedback;
 
 	private List<GameObject> m_turnHeads;
 	private ArcElement m_arcElement;
@@ -22,6 +26,7 @@ public class ClickElement : MonoBehaviour {
 	private float m_clickAngle = 0.0f;
 	private AudioSource m_audioSource;
 	private bool m_bDone = false;
+	private GameObject m_outcome;
 
 	void Awake() {
 		m_arcElement = GetComponentInChildren<ArcElement>();
@@ -29,6 +34,11 @@ public class ClickElement : MonoBehaviour {
 			Debug.LogError("Click Element couldn't find Arc Element component in children");
 		}
 		m_audioSource = GetComponent<AudioSource>();
+		m_outcome = transform.Find("Outcome").gameObject;
+		if(m_outcome == null) {
+			Debug.Log("ClickElement couldn't find outcome object");
+		}
+		m_outcome.SetActive(false);
 	}
 
 	// Use this for initialization
@@ -100,22 +110,35 @@ public class ClickElement : MonoBehaviour {
 	void EndOfLife(HitState state) {
 		// TODO: initiate feedback then schedule kill all involved objects
 		// TODO: sound effects should be played by game controller since they should play regardless of active state or destroy
+		MeshRenderer mr = m_outcome.GetComponent<MeshRenderer>();
+		bool emit_particle = false;
 		switch(state) {
 			case HitState.Early:
+				mr.material.mainTexture = m_outcomeMiss;
 				break;
 			case HitState.Hit:
 				m_audioSource.clip = m_hitSound;
 				m_audioSource.Play();
+				mr.material.mainTexture = m_outcomeHit;
+				emit_particle = true;
 				break;
 			case HitState.Miss:
 				m_audioSource.clip = m_missSound;
 				m_audioSource.Play();
+				mr.material.mainTexture = m_outcomeMiss;
 				break;
 			case HitState.Perfect:
 				// TODO: Perfect should have a special sound!
 				m_audioSource.clip = m_hitSound;
 				m_audioSource.Play();
+				mr.material.mainTexture = m_outcomePerfect;
+				emit_particle = true;
 				break;
+		}
+		m_outcome.SetActive(true);
+		if(emit_particle) {
+			GameObject particle_effect = Instantiate(m_particleFeedback, transform.position, transform.rotation);
+			particle_effect.transform.position = new Vector3(transform.position.x, transform.position.y, 0.5f); // 0.5f is effects front
 		}
 		m_bDone = true;
 		Destroy(gameObject, 1.0f);

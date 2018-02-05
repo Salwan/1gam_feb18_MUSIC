@@ -25,7 +25,6 @@ public class GameController : MonoBehaviour {
 	void StartGame() {
 		m_startText.SetActive(true);
 		m_startText.transform.localScale = new Vector3(2.0f, 2.0f, 1.0f);
-		iTween.FadeTo(m_startText, iTween.Hash("alpha", 0.0f, "time", 0.25f, "amount", 1.0f));
 		iTween.ScaleTo(m_startText, new Vector3(1.0f, 1.0f, 1.0f), 0.4f);
 		iTween.MoveTo(m_startText, iTween.Hash(
 			"position", new Vector3(12.0f, 4.0f, 0.0f), "time", 0.5f, "delay", 1.0f, "easeType", iTween.EaseType.easeInCirc
